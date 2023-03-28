@@ -19,6 +19,10 @@
 
 	<script>
 		var canvas = document.getElementById('canvas');
+		canvas.addEventListener('touchmove', function (e) {
+			e.preventDefault();
+		}, { passive: false });
+
 		var ctx = canvas.getContext('2d');
 		var square1 = {
 			x: 50,
@@ -61,6 +65,7 @@
 		});
 
 		canvas.addEventListener('mouseup', function () {
+			console.log("test");
 			dragging = false;
 		});
 
@@ -99,6 +104,7 @@
 				draw();
 			}
 		});
+
 		function checkOverlap() {
 			var overlap = false;
 			if (square1.x >= square2.x && square1.x <= square2.x + square2.size && square1.y >= square2.y && square1.y <= square2.y + square2.size) {
