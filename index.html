@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Canvas Responsivo</title>
+
+	<link rel="stylesheet" href="./css/default.css">
+	<link rel="stylesheet" href="./css/canvas.css">
+
+</head>
+
+<body>
+	<canvas id="canvas"></canvas>
+
+	<select id="select">
+		<option value="0">Selecione</option>
+		<option value="1">Quadrado 1</option>
+	</select>
+
+	<script>
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+		var square1 = {
+			x: 50,
+			y: 50,
+			size: 50,
+			color: '#FF0000'
+		};
+		var square2 = {
+			x: 200,
+			y: 200,
+			size: 100,
+			color: '#00FF00'
+		};
+		var dragging = false;
+		var offsetX;
+		var offsetY;
+
+		draw();
+		resizeCanvas();
+
+		function resizeCanvas() {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			draw();
+		}
+
+		function draw() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			drawSquare(square1);
+			drawSquare(square2);
+		}
+
+		function drawSquare(square) {
+			ctx.fillStyle = square.color;
+			ctx.fillRect(square.x, square.y, square.size, square.size);
+		}
+
+		canvas.addEventListener('mousedown', function (e) {
+			console.log('mousedown');
+			console.log(dragging);
+			var mouseX = e.clientX - canvas.offsetLeft;
+			var mouseY = e.clientY - canvas.offsetTop;
+			console.log(`mX: ${mouseX}`);
+			console.log(`mY: ${mouseY}`);
+			console.log(`qX: ${square1.x}`);
+			console.log(`qY: ${square1.y}`);
+
+
+			if (mouseX >= square1.x && mouseX <= square1.x + square1.size && mouseY >= square1.y && mouseY <= square1.y + square1.size) {
+				console.log('Quadrado');
+				dragging = true;
+				offsetX = mouseX - square1.x;
+				offsetY = mouseY - square1.y;
+			}
+		});
+
+		canvas.addEventListener('mouseup', function () {
+			console.log('mouseup');
+			console.log(dragging);
+			dragging = false;
+		});
+
+		canvas.addEventListener('mousemove', function (e) {
+			if (dragging) {
+				var mouseX = e.clientX - canvas.offsetLeft;
+				var mouseY = e.clientY - canvas.offsetTop;
+				square1.x = mouseX - offsetX;
+				square1.y = mouseY - offsetY;
+				checkOverlap();
+				draw();
+			}
+		});
+
+		function checkOverlap() {
+			if (square1.x + square1.size > square2.x && square1.x < square2.x + square2.size && square1.y + square1.size > square2.y && square1.y < square2.y + square2.size) {
+				square1.color = '#00FF00';
+			} else {
+				square1.color = '#FF0000';
+			}
+		}
+
+		var select = document.getElementById('select');
+		select.addEventListener('change', function () {
+			if (select.value == 1) {
+				square1.x = square2.x + (square2.size / 2) - (square1.size / 2);
+				square1.y = square2.y + (square2.size / 2) - (square1.size / 2);
+				checkOverlap();
+				draw();
+			}
+		});
+
+		window.addEventListener('resize', function () {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			draw();
+		});
+	</script>
+</body>
+
+</html>
