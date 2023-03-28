@@ -33,17 +33,11 @@
 			color: '#00FF00'
 		};
 		var dragging = false;
+		var touchDragging = false;
 		var offsetX;
 		var offsetY;
 
 		draw();
-		resizeCanvas();
-
-		function resizeCanvas() {
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			draw();
-		}
 
 		function draw() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -57,18 +51,9 @@
 		}
 
 		canvas.addEventListener('mousedown', function (e) {
-			console.log('mousedown');
-			console.log(dragging);
 			var mouseX = e.clientX - canvas.offsetLeft;
 			var mouseY = e.clientY - canvas.offsetTop;
-			console.log(`mX: ${mouseX}`);
-			console.log(`mY: ${mouseY}`);
-			console.log(`qX: ${square1.x}`);
-			console.log(`qY: ${square1.y}`);
-
-
 			if (mouseX >= square1.x && mouseX <= square1.x + square1.size && mouseY >= square1.y && mouseY <= square1.y + square1.size) {
-				console.log('Quadrado');
 				dragging = true;
 				offsetX = mouseX - square1.x;
 				offsetY = mouseY - square1.y;
@@ -76,8 +61,6 @@
 		});
 
 		canvas.addEventListener('mouseup', function () {
-			console.log('mouseup');
-			console.log(dragging);
 			dragging = false;
 		});
 
@@ -92,9 +75,37 @@
 			}
 		});
 
+		canvas.addEventListener('touchstart', function (e) {
+			var touchX = e.touches[0].clientX - canvas.offsetLeft;
+			var touchY = e.touches[0].clientY - canvas.offsetTop;
+			if (touchX >= square1.x && touchX <= square1.x + square1.size && touchY >= square1.y && touchY <= square1.y + square1.size) {
+				touchDragging = true;
+				offsetX = touchX - square1.x;
+				offsetY = touchY - square1.y;
+			}
+		});
+
+		canvas.addEventListener('touchend', function () {
+			touchDragging = false;
+		});
+
+		canvas.addEventListener('touchmove', function (e) {
+			if (touchDragging) {
+				var touchX = e.touches[0].clientX - canvas.offsetLeft;
+				var touchY = e.touches[0].clientY - canvas.offsetTop;
+				square1.x = touchX - offsetX;
+				square1.y = touchY - offsetY;
+				checkOverlap();
+				draw();
+			}
+		});
 		function checkOverlap() {
-			if (square1.x + square1.size > square2.x && square1.x < square2.x + square2.size && square1.y + square1.size > square2.y && square1.y < square2.y + square2.size) {
-				square1.color = '#00FF00';
+			var overlap = false;
+			if (square1.x >= square2.x && square1.x <= square2.x + square2.size && square1.y >= square2.y && square1.y <= square2.y + square2.size) {
+				overlap = true;
+			}
+			if (overlap) {
+				square1.color = '#00FFFF';
 			} else {
 				square1.color = '#FF0000';
 			}
@@ -102,17 +113,17 @@
 
 		var select = document.getElementById('select');
 		select.addEventListener('change', function () {
-			if (select.value == 1) {
-				square1.x = square2.x + (square2.size / 2) - (square1.size / 2);
-				square1.y = square2.y + (square2.size / 2) - (square1.size / 2);
+			if (select.value === '1') {
+				square1.x = square2.x + square2.size / 2 - square1.size / 2;
+				square1.y = square2.y + square2.size / 2 - square1.size / 2;
 				checkOverlap();
 				draw();
 			}
 		});
 
 		window.addEventListener('resize', function () {
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
+			canvas.width = canvas.offsetWidth;
+			canvas.height = canvas.offsetHeight;
 			draw();
 		});
 	</script>
